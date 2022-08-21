@@ -1,9 +1,9 @@
 # Build xrdp pulseaudio modules in builder container
 # See https://github.com/neutrinolabs/pulseaudio-module-xrdp/wiki/README
 ARG TAG=latest
-FROM ubuntu:$TAG as builder
+FROM debian:$TAG as builder
 
-RUN sed -i -E 's/^# deb-src /deb-src /g' /etc/apt/sources.list \
+RUN sed -i -E '/^deb /p; s/^deb /deb-src /' /etc/apt/sources.list \
     && apt-get update \
     && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
         build-essential \
@@ -27,7 +27,7 @@ RUN git clone https://github.com/neutrinolabs/pulseaudio-module-xrdp.git /pulsea
 
 
 # Build the final image
-FROM ubuntu:$TAG
+FROM debian:$TAG
 
 RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
