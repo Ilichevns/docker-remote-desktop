@@ -32,7 +32,7 @@ FROM debian:$TAG
 RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
         dbus-x11 \
-        firefox \
+        firefox-esr \
         git \
         locales \
         pavucontrol \
@@ -45,7 +45,6 @@ RUN apt-get update \
         xfce4-pulseaudio-plugin \
         xorgxrdp \
         xrdp \
-        xubuntu-icon-theme \
     && rm -rf /var/lib/apt/lists/*
 
 RUN sed -i -E 's/^; autospawn =.*/autospawn = yes/' /etc/pulse/client.conf \
