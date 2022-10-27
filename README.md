@@ -1,17 +1,17 @@
 # docker-remote-desktop
 
-[![build](https://github.com/scottyhardy/docker-remote-desktop/actions/workflows/build.yml/badge.svg)](https://github.com/scottyhardy/docker-remote-desktop/actions/workflows/build.yml)
+[![build](https://github.com/ilichevns/docker-remote-desktop/actions/workflows/build.yml/badge.svg)](https://github.com/ilichevns/docker-remote-desktop/actions/workflows/build.yml)
 
-Docker image with RDP server using [xrdp](http://xrdp.org) on Ubuntu with [XFCE](https://xfce.org).
+Docker image with RDP server using [xrdp](http://xrdp.org) on Debian with [XFCE](https://xfce.org).
 
-Images are built weekly using the Ubuntu Docker image with the 'latest' tag.
+Images are built weekly using the Debian Docker image with the 'latest' tag.
 
 ## Running manually with `docker` commands
 
 Download the latest version of the image:
 
 ```bash
-docker pull scottyhardy/docker-remote-desktop
+docker pull ilichevns/docker-remote-desktop
 ```
 
 To run with an interactive bash session:
@@ -22,7 +22,7 @@ docker run -it \
     --hostname="$(hostname)" \
     --publish="3389:3389/tcp" \
     --name="remote-desktop" \
-    scottyhardy/docker-remote-desktop:latest /bin/bash
+    ilichevns/docker-remote-desktop:latest /bin/bash
 ```
 
 To start as a detached daemon:
@@ -33,7 +33,7 @@ docker run --detach \
     --hostname="$(hostname)" \
     --publish="3389:3389/tcp" \
     --name="remote-desktop" \
-    scottyhardy/docker-remote-desktop:latest
+    ilichevns/docker-remote-desktop:latest
 ```
 
 To stop the detached container:
@@ -52,20 +52,18 @@ NOTE: To connect to a remote machine, it will require TCP port 3389 to be expose
 To log in, use the following default user account details:
 
 ```bash
-Username: ubuntu
-Password: ubuntu
+Username: debian
+Password: debian
 ```
 
-![Screenshot of login prompt](https://raw.githubusercontent.com/scottyhardy/docker-remote-desktop/master/screenshot_1.png)
-
-![Screenshot of XFCE desktop](https://raw.githubusercontent.com/scottyhardy/docker-remote-desktop/master/screenshot_2.png)
+![Screenshot of XFCE desktop](https://raw.githubusercontent.com/ilichevns/docker-remote-desktop/master/screenshot_2.png)
 
 ## Building docker-remote-desktop on your own machine
 
 First, clone the GitHub repository:
 
 ```bash
-git clone https://github.com/scottyhardy/docker-remote-desktop.git
+git clone https://github.com/ilichevns/docker-remote-desktop.git
 
 cd docker-remote-desktop
 ```
