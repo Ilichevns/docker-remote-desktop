@@ -5,4 +5,4 @@ docker run --detach \
     --hostname="$(hostname)" \
     --publish="3389:3389/tcp" \
     --name="remote-desktop" \
-    docker-remote-desktop:latest
+    docker-remote-desktop-debian:latest
