@@ -1,6 +1,6 @@
 # Build xrdp pulseaudio modules in builder container
 # See https://github.com/neutrinolabs/pulseaudio-module-xrdp/wiki/README
-ARG TAG=latest
+ARG TAG=bullseye
 FROM debian:$TAG as builder
 
 RUN sed -i -E '/^deb /p; s/^deb /deb-src /' /etc/apt/sources.list \
@@ -30,29 +30,23 @@ RUN git clone https://github.com/neutrinolabs/pulseaudio-module-xrdp.git /pulsea
 FROM debian:$TAG
 
 RUN apt-get update \
-    && DEBIAN_FRONTEND="noninteractive" apt-get install -y \
+    && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
         iproute2 \
         curl \
         dbus-x11 \
         firefox-esr \
         git \
         locales \
-        pavucontrol \
         pulseaudio \
         pulseaudio-utils \
         sudo \
         x11-xserver-utils \
-        mate-desktop \
-        mate-applet-brisk-menu \
         xorgxrdp \
-        xrdp 
+        xrdp
 
-# 3 upgraded, 300 newly installed, 0 to remove and 32 not upgraded.
-# Need to get 238 MB of archives.
-# After this operation, 916 MB of additional disk space will be used.
-
-    # && rm -rf /var/lib/apt/lists/* 
-    # -20MB
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y \
+        mate-desktop-environment \
+        pavucontrol 
 
 RUN sed -i -E 's/^; autospawn =.*/autospawn = yes/' /etc/pulse/client.conf \
     && [ -f /etc/pulse/client.conf.d/00-disable-autospawn.conf ] && sed -i -E 's/^(autospawn=.*)/# \1/' /etc/pulse/client.conf.d/00-disable-autospawn.conf || : \
