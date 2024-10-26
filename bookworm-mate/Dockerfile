@@ -1,0 +1,63 @@
+ARG TAG=bookworm
+
+# Build xrdp pulseaudio modules in builder container
+# See https://github.com/neutrinolabs/pulseaudio-module-xrdp/wiki/README
+FROM debian:$TAG as builder
+
+RUN sed -i -E 's/(Types: deb)$/\1 deb-src/' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update \
+    && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
+        build-essential \
+        dpkg-dev \
+        git \
+        libpulse-dev \
+        pulseaudio \
+        doxygen \
+    && apt-get build-dep -y pulseaudio \
+    && apt-get source pulseaudio \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN cd /pulseaudio-* \
+    && meson build
+
+RUN git clone https://github.com/neutrinolabs/pulseaudio-module-xrdp.git /pulseaudio-module-xrdp \
+    && cd /pulseaudio-module-xrdp \
+    && ./bootstrap \
+    && ./configure PULSE_DIR=$(ls -d /pulseaudio-$(pulseaudio --version | awk '{print $2}')* | head -1) \
+    && make \
+    && make install
+
+# Build the final image
+FROM debian:$TAG
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND="noninteractive" apt-get install -y apt-utils \
+    && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
+        iproute2 \
+        curl \
+        dbus-x11 \
+        firefox-esr \
+        git \
+        locales \
+        pulseaudio \
+        pulseaudio-utils \
+        sudo \
+        x11-xserver-utils \
+        xorgxrdp \
+        xrdp
+
+COPY --from=builder /usr/lib/pulse-*/modules/module-xrdp-sink.so /usr/lib/pulse-*/modules/module-xrdp-source.so /var/lib/xrdp-pulseaudio-installer/
+
+RUN sed -i -E 's/^; autospawn =.*/autospawn = yes/' /etc/pulse/client.conf \
+    && [ -f /etc/pulse/client.conf.d/00-disable-autospawn.conf ] && sed -i -E 's/^(autospawn=.*)/# \1/' /etc/pulse/client.conf.d/00-disable-autospawn.conf || : \
+    && locale-gen en_US.UTF-8
+
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y \
+        mate-desktop-environment \
+        pavucontrol 
+
+ENV LANG en_US.UTF-8
+
+COPY entrypoint.sh /usr/bin/entrypoint
+EXPOSE 3389/tcp
+ENTRYPOINT ["/usr/bin/entrypoint"]
